@@ -58,7 +58,7 @@ def set_styles():
             .header { color: black; font-size: 24px; text-align: center; }
             .footer {
                 text-align: center;
-                margin-top: 20px;
+                margin-top: 10px;
                 color: grey;
             }
             .back-option {
@@ -159,11 +159,11 @@ def set_styles():
             color: black;
             margin-bottom: 5px; /* Reduced bottom margin */
             }
-            .result-text {
-                font-size: 16px; /* Reduced font size */
-                font-weight: bold;
-                color: black;
-                margin-top: 10px; /* Optional, reduce the top margin */
-            }
+        .result-text {
+            font-size: 16px; /* Reduced font size */
+            font-weight: bold;
+            color: black;
+            margin-top: 10px; /* Optional, reduce the top margin */
+        }
             </style>
     """, unsafe_allow_html=True)
