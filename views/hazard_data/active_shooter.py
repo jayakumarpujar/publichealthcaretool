@@ -1,7 +1,110 @@
 import streamlit as st
+import os
+import json
+
+from views.baseline_data.community_characteristics import handle_form_submission
+
+# Paths to your JSON files
+hazard_data_file = 'hazard_data.json'
+baseline_data_file = 'baseline_data.json'
+
+# Function to load data from the baseline_data.json file
+def load_baseline_data():
+    if os.path.exists(baseline_data_file):
+        with open(baseline_data_file, 'r') as file:
+            try:
+                data = json.load(file)
+                return data
+            except json.JSONDecodeError:
+                st.error("Error loading baseline data: Invalid JSON format.")
+                return {}
+    else:
+        st.error("Baseline data file not found.")
+        return {}
+
+
+# Function to load data from the hazard_data.json file
+def load_hazard_data():
+    if os.path.exists(hazard_data_file):
+        with open(hazard_data_file, 'r') as file:
+            try:
+                data = json.load(file)
+                return data
+            except json.JSONDecodeError:
+                # If the file is empty or contains invalid JSON, return an empty dict
+                return {}
+    return {}
+
+# Function to save data to the hazard_data.json file
+def save_data(page_key, data):
+    try:
+        # Load existing data from the hazard_data.json file
+        if os.path.exists(hazard_data_file):
+            with open(hazard_data_file, 'r') as file:
+                existing_data = json.load(file)
+        else:
+            existing_data = {}
+
+        # Update the data for this page using the page_key
+        existing_data[page_key] = data
+
+        # Save updated data back to the file
+        with open(hazard_data_file, 'w') as file:
+            json.dump(existing_data, file, indent=4)
+
+        st.success("Data saved successfully!")
+    except Exception as e:
+        st.error(f"Error saving data: {e}")
+
+
+
+# Prefill form with baseline data (e.g., Baseline Mortality per Day)
+def prefill_form():
+    baseline_data = load_baseline_data()
+    
+    # Example: Prefill "Baseline Mortality per Day" from baseline_data.json  -> total deaths per day
+    baseline_mortality = baseline_data.get("total_deaths_per_day", 0.0)  # Default to 0.0 if not found
+    baseline_ems_transport = baseline_data.get("total_transports_per_day", 0.0)
+    baseline_ed_visists = baseline_data.get("total_ed_visits_per_day", 0.0)
+    baseline_primary_care_office = baseline_data.get("total_office_visits_per_day",0.0)
+    baseline_trauma_center_injuries = baseline_data.get("total_trauma_injuries_per_day",0.0)
+
+    # Ensure baseline_mortality is a float
+    try:
+        baseline_mortality = float(baseline_mortality)
+        baseline_ems_transport = float(baseline_ems_transport)
+        baseline_ed_visists = float(baseline_ed_visists)
+        baseline_primary_care_office = float(baseline_primary_care_office)
+        baseline_trauma_center_injuries = float(baseline_trauma_center_injuries)
+    except ValueError:
+        baseline_mortality = 0.0  # Fallback if value can't be converted to float
+        baseline_ems_transport = 0.0
+        baseline_ed_visists = 0.0
+        baseline_primary_care_office =0.0
+        baseline_trauma_center_injuries =0.0
+
+
+    # Prefill the session state for Baseline Mortality
+    if "Baseline Mortality per Day" not in st.session_state:
+        st.session_state["Baseline Mortality per Day"] = baseline_mortality
+
+    if "Baseline Transports per Day" not in st.session_state:
+        st.session_state["Baseline Transports per Day"] = baseline_ems_transport
+    
+    if "Baseline ED Visits per Day" not in st.session_state:
+        st.session_state["Baseline ED Visits per Day"] = baseline_ed_visists
+
+    if "Baseline Primary Care Office Visits" not in st.session_state:
+        st.session_state["Baseline Primary Care Office Visits"]= baseline_primary_care_office
+    
+    if "Baseline Trauma Center Injuries" not in st.session_state:
+        st.session_state["Baseline Trauma Center Injuries"]= baseline_trauma_center_injuries
+
 
 def show():
-    
+    # Prefill the form if data exists
+    prefill_form()
+
     st.markdown("""
     <p>An active shooter is an individual actively engaged in killing or attempting to kill people in a confined and other populated area. 
     In most cases, active shooters use firearms and there is no pattern or method to their selection of victims. Active shooter situations 
@@ -37,453 +140,221 @@ def show():
     probability_score = probability_mapping[selected_probability]
     
     st.markdown(f"**Probability Score:** {probability_score} {'Occasional' if probability_score == 2 else ''}", unsafe_allow_html=True)
-    
-    
+
+
     st.markdown("<h3 style='text-align: center;'>Human Impact</h3>", unsafe_allow_html=True)
+    
+    # Human Impact Sections
+    handle_section("Mortality", "Baseline Mortality per Day", "Hazard-Related Increase in Mortality per Day",   "In the VA Tech Massacre of 2007, 33 died at the scene, including the shooter (Armstrong & Frykberg, 2007).")
+    handle_ems_section("EMS Transports", "Baseline Transports per Day", "Hazard-Related Increase in Transports per Day",  "In the VA Tech Massacre of 2007, 17 were transported by EMS (Armstrong & Frykberg, 2007).")
+    handle_ed_visits_section("ED Visits", "Baseline ED Visits per Day", "Hazard-Related Increase in ED Visits per Day",   "In the VA Tech Massacre of 2007, 27 were treated at local emergency departments (Virginia Tech Review Panel, 2007).")
+    handle_ed_visits_section("Primary Care Office Visits", "Baseline Office Visits per Day", "Hazard-Related Increase in Office Visits per Day", "Please provide data")
+    handle_ed_visits_section("Trauma Center Injuries", "Baseline Trauma Injuries per Day", "Hazard-Related Increase in Trauma Injuries per Day",   "In the VA Tech Massacre of 2007, 10 were taken to Level III trauma centers, and 2 to Level I centers (Armstrong & Frykberg, 2007).")
 
-    st.markdown("<h2 class='subheader'>Mortality</h2>", unsafe_allow_html=True)
-    
-    # Input fields
-    baseline_mortality = st.number_input("Baseline Mortality per Day:", value=0)
-    hazard_increase_mortality = st.number_input("Hazard-Related Increase in Mortality per Day:", value=0)
-    
-    st.markdown("<span class='input-label'>Magnitude Score:</span>", unsafe_allow_html=True)
-    magnitude_option = st.radio(
-        "",
-        [
-            "No change from baseline (Score = 0)",
-            "≤ 5% increase (Score = 1)",
-            "≤ 50% increase (Score = 2)",
-            "≤ 100% increase (Score = 3)",
-            "> 100% increase (Score = 4)"
-        ],
-        index=0,
-        key="mortality_magnitude_radio"
-    )
-    magnitude_score = {
-        "No change from baseline (Score = 0)": 0,
-        "≤ 5% increase (Score = 1)": 1,
-        "≤ 50% increase (Score = 2)": 2,
-        "≤ 100% increase (Score = 3)": 3,
-        "> 100% increase (Score = 4)": 4,
-    }[magnitude_option]
-    st.markdown(f"<span class='result-text'>Magnitude Score: {magnitude_score}</span>", unsafe_allow_html=True)
+def calculate_magnitude_score(baseline, increase):
+    # Convert baseline and increase to floats, and handle any potential non-numeric values
+    try:
+        baseline = float(baseline)
+        increase = float(increase)
+    except ValueError:
+        return "Not calculated"
 
-    st.markdown("**OR, Estimate the Magnitude Qualitatively:**", unsafe_allow_html=True)
-    qualitative_option = st.selectbox(
-        "Qualitative Magnitude Score:",
-        [
-            "No impact (Score = 0)",
-            "≤ 1 day (Score = 1)",
-            "≤ 1 week (Score = 2)",
-            "≤ 2 weeks (Score = 3)",
-            "> 2 weeks (Score = 4)"
-        ],
-        index=0,
-        key="mortality_qualitative_select"
-    )
-    qualitative_score = {
-        "No impact (Score = 0)": 0,
-        "≤ 1 day (Score = 1)": 1,
-        "≤ 1 week (Score = 2)": 2,
-        "≤ 2 weeks (Score = 3)": 3,
-        "> 2 weeks (Score = 4)": 4,
-    }[qualitative_option]
+    if baseline == 0 or baseline == "NA":
+        return "Not calculated"
     
-    # Display the calculated Duration Score
-    st.markdown("<span class='input-label'>Duration of Impact:</span>", unsafe_allow_html=True)
-    duration_option = st.selectbox(
-        "Duration Score:",
-        [
-            "No impact (Score = 0)",
-            "≤ 1 day (Score = 1)",
-            "≤ 1 week (Score = 2)",
-            "≤ 2 weeks (Score = 3)",
-            "> 2 weeks (Score = 4)"
-        ],
-        index=0,
-        key="mortality_duration_select"
-    )
-    duration_score = {
-        "No impact (Score = 0)": 0,
-        "≤ 1 day (Score = 1)": 1,
-        "≤ 1 week (Score = 2)": 2,
-        "≤ 2 weeks (Score = 3)": 3,
-        "> 2 weeks (Score = 4)": 4,
-    }[duration_option]
-    
-    # Calculate Mortality Score
-    mortality_score = (qualitative_score + duration_score) / 2
-    
-    # Display Data Source / Explanation
-    st.text_area("Data Source / Explanation (Optional):", "In the VA Tech Massacre of 2007, 33 died at the scene, including the shooter (Armstrong & Frykberg, 2007).")
-    
-    # Display Resulting Scores
-    st.markdown(f"<span class='result-text'>Qualitative Magnitude Score: {qualitative_score}</span>", unsafe_allow_html=True)
-    st.markdown(f"<span class='result-text'>Duration Score: {duration_score}</span>", unsafe_allow_html=True)
-    st.markdown(f"<span class='result-text'>Mortality Score: {mortality_score}</span>", unsafe_allow_html=True)
-#*************************************************************************************************************
-    st.markdown("<h2 class='subheader'>EMS Transports</h2>", unsafe_allow_html=True)
-    
-    # Input fields
-    baseline_transports = st.number_input("Baseline Transports per Day:", value=0)
-    hazard_increase_transports = st.number_input("Hazard-Related Increase in Transports per Day:", value=0)
-    
-    st.markdown("<span class='input-label'>Magnitude Score:</span>", unsafe_allow_html=True)
-    magnitude_option = st.radio(
-        "",
-        [
-            "No change from baseline (Score = 0)",
-            "≤ 5% increase (Score = 1)",
-            "≤ 50% increase (Score = 2)",
-            "≤ 100% increase (Score = 3)",
-            "> 100% increase (Score = 4)"
-        ],
-        index=0,
-        key="ems_magnitude_radio"
-    )
-    magnitude_score = {
-        "No change from baseline (Score = 0)": 0,
-        "≤ 5% increase (Score = 1)": 1,
-        "≤ 50% increase (Score = 2)": 2,
-        "≤ 100% increase (Score = 3)": 3,
-        "> 100% increase (Score = 4)": 4,
-    }[magnitude_option]
-    st.markdown(f"<span class='result-text'>Magnitude Score: {magnitude_score}</span>", unsafe_allow_html=True)
+    # Calculate the ratio (Baseline + Hazard-Related Increase) / Baseline
+    ratio = (baseline + increase) / baseline
+    if ratio <= 1:
+        return 0
+    elif ratio <= 1.05:
+        return 1
+    elif ratio <= 1.5:
+        return 2
+    elif ratio <= 2:
+        return 3
+    else:
+        return 4
 
-    st.markdown("**OR, Estimate the Magnitude Qualitatively:**", unsafe_allow_html=True)
-    qualitative_option = st.selectbox(
-        "Qualitative Magnitude Score:",
-        [
-            "No impact (Score = 0)",
-            "≤ 1 day (Score = 1)",
-            "≤ 1 week (Score = 2)",
-            "≤ 2 weeks (Score = 3)",
-            "> 2 weeks (Score = 4)"
-        ],
-        index=0,
-        key="ems_qualitative_select"
-    )
-    qualitative_score = {
-        "No impact (Score = 0)": 0,
-        "≤ 1 day (Score = 1)": 1,
-        "≤ 1 week (Score = 2)": 2,
-        "≤ 2 weeks (Score = 3)": 3,
-        "> 2 weeks (Score = 4)": 4,
-    }[qualitative_option]
+def handle_section(section_title, baseline_label, increase_label, default_explanation=""):
+    st.markdown(f"<h4>{section_title}</h4>", unsafe_allow_html=True)
     
-    # Display the calculated Duration Score
-    st.markdown("<span class='input-label'>Duration of Impact:</span>", unsafe_allow_html=True)
-    duration_option = st.selectbox(
-        "Duration Score:",
-        [
-            "No impact (Score = 0)",
-            "≤ 1 day (Score = 1)",
-            "≤ 1 week (Score = 2)",
-            "≤ 2 weeks (Score = 3)",
-            "> 2 weeks (Score = 4)"
-        ],
-        index=0,
-        key="ems_duration_select"
-    )
-    duration_score = {
-        "No impact (Score = 0)": 0,
-        "≤ 1 day (Score = 1)": 1,
-        "≤ 1 week (Score = 2)": 2,
-        "≤ 2 weeks (Score = 3)": 3,
-        "> 2 weeks (Score = 4)": 4,
-    }[duration_option]
+    baseline_value = st.session_state.get(baseline_label, "Not Calculated")
+    st.markdown(f"**{baseline_label}:** {baseline_value}")
+
     
-    # Calculate EMS Transports Score
-    ems_score = (qualitative_score + duration_score) / 2
+    # Hazard-Related Increase (editable by user, converted to float)
+    hazard_increase = st.number_input(increase_label, value=0, key=f"{section_title}_hazard_increase")
     
-    # Display Data Source / Explanation
-    st.text_area("Data Source / Explanation (Optional):", "In the VA Tech Massacre of 2007, 17 were transported by EMS (Armstrong & Frykberg, 2007).")
+    # Calculate Magnitude Score
+    magnitude_score = calculate_magnitude_score(baseline_value, hazard_increase)
+    st.markdown(f"**Magnitude Score:** {magnitude_score}")
+    st.markdown("""
+        <ul>
+            <li>0: No change from baseline</li>
+            <li>1: ≤ 5% increase</li>
+            <li>2: ≤ 50% increase</li>
+            <li>3: ≤ 100% increase</li>
+            <li>4: > 100% increase</li>
+        </ul>
+    """, unsafe_allow_html=True)
     
-    # Display Resulting Scores
-    st.markdown(f"<span class='result-text'>Qualitative Magnitude Score: {qualitative_score}</span>", unsafe_allow_html=True)
-    st.markdown(f"<span class='result-text'>Duration Score: {duration_score}</span>", unsafe_allow_html=True)
-    st.markdown(f"<span class='result-text'>EMS Transports Score: {ems_score}</span>", unsafe_allow_html=True)
+    # Qualitative Magnitude Score (user can select)
+    qualitative_option = st.selectbox("OR, Estimate the Magnitude Qualitatively:", 
+                                      ["Use Quantitative Value", "No change from baseline (Score = 0)", 
+                                       "≤ 5% increase (Score = 1)", "≤ 50% increase (Score = 2)", 
+                                       "≤ 100% increase (Score = 3)", ">100% increase (Score = 4)"], 
+                                      index=0, key=f"{section_title}_qualitative")
+    
+    # If qualitative option is not "Use Quantitative Value", extract the score
+    if qualitative_option != "Use Quantitative Value":
+        qualitative_score = int(qualitative_option.split("Score = ")[-1][0])
+    else:
+        qualitative_score = None
+    
+    # Duration of Impact (user can select)
+    duration_option = st.selectbox("Duration of Impact:", 
+                                   ["No impact (Score = 0)", "≤ 1 day (Score = 1)", 
+                                    "≤ 1 week (Score = 2)", "≤ 2 weeks (Score = 3)", 
+                                    "> 2 weeks (Score = 4)"], 
+                                   index=0, key=f"{section_title}_duration")
+    
+    # Calculate Duration Score
+    duration_score = int(duration_option.split("Score = ")[-1][0])
+    
+    # Data Source / Explanation (Optional)
+    st.text_area("Data Source / Explanation (Optional):", default_explanation, key=f"{section_title}_explanation")
+    
+    # Calculate final score
+    if qualitative_score is None and magnitude_score == "Not calculated":
+        final_score = "Not Calculated/NA"
+    elif qualitative_score is not None:
+        final_score = (qualitative_score + duration_score) / 2
+    else:
+        final_score = (magnitude_score + duration_score) / 2
+    
+    # Display the final mortality score
+    st.markdown(f"**Mortality Score:** {final_score}")
+
+# New function to handle EMS Transports
+def handle_ems_section(section_title, baseline_label, increase_label, default_explanation=""):
+    st.markdown(f"<h4>{section_title}</h4>", unsafe_allow_html=True)
+
+    baseline_value = st.session_state.get(baseline_label, "Not Calculated")
+    st.markdown(f"**{baseline_label}:** {baseline_value}")
+
+    # Hazard-Related Increase (editable by user)
+    hazard_increase = st.number_input(increase_label, value=0, key=f"{section_title}_hazard_increase")
+
+    # Calculate Magnitude Score based on EMS Transports logic
+    magnitude_score = calculate_magnitude_score(baseline_value, hazard_increase)
+    st.markdown(f"**Magnitude Score:** {magnitude_score}")
+    st.markdown("""
+        <ul>
+            <li>0: No change from baseline</li>
+            <li>1: ≤ 5% increase</li>
+            <li>2: ≤ 50% increase</li>
+            <li>3: ≤ 100% increase</li>
+            <li>4: > 100% increase</li>
+        </ul>
+    """, unsafe_allow_html=True)
+
+    # Qualitative Magnitude Score (user can select)
+    qualitative_option = st.selectbox("OR, Estimate the Magnitude Qualitatively:", 
+                                      ["Use Quantitative Value", "No change from baseline (Score = 0)", 
+                                       "≤ 5% increase (Score = 1)", "≤ 50% increase (Score = 2)", 
+                                       "≤ 100% increase (Score = 3)", ">100% increase (Score = 4)"], 
+                                      index=0, key=f"{section_title}_qualitative")
+
+    # If qualitative option is not "Use Quantitative Value", extract the score
+    if qualitative_option != "Use Quantitative Value":
+        qualitative_score = int(qualitative_option.split("Score = ")[-1][0])
+    else:
+        qualitative_score = None
+
+    # Duration of Impact (user can select)
+    duration_option = st.selectbox("Duration of Impact:", 
+                                   ["No impact (Score = 0)", "≤ 1 day (Score = 1)", 
+                                    "≤ 1 week (Score = 2)", "≤ 2 weeks (Score = 3)", 
+                                    "> 2 weeks (Score = 4)"], 
+                                   index=0, key=f"{section_title}_duration")
+
+    # Calculate Duration Score
+    duration_score = int(duration_option.split("Score = ")[-1][0])
+
+    # Data Source / Explanation (Optional)
+    st.text_area("Data Source / Explanation (Optional):", default_explanation, key=f"{section_title}_explanation")
+
+    # Calculate final score for EMS Transports
+    if qualitative_score is None and magnitude_score == "Not calculated":
+        final_score = "Not Calculated/NA"
+    elif qualitative_score is not None:
+        final_score = (qualitative_score + duration_score) / 2
+    else:
+        final_score = (magnitude_score + duration_score) / 2
+
+    # Display the final EMS Transport score
+    st.markdown(f"**{section_title} Score:** {final_score}")
 
 
-    st.markdown("<h2 class='subheader'>ED Visits</h2>", unsafe_allow_html=True)
+# Function to handle ED Visits section 
+def handle_ed_visits_section(section_title, baseline_label, increase_label, default_explanation=""):
+    st.markdown(f"<h4>{section_title}</h4>", unsafe_allow_html=True)
     
-    # Input fields
-    baseline_ed_visits = st.number_input("Baseline ED Visits per Day:", value=0)
-    hazard_increase_ed_visits = st.number_input("Hazard-Related Increase in ED Visits per Day:", value=0)
-    
-    st.markdown("<span class='input-label'>Magnitude Score:</span>", unsafe_allow_html=True)
-    magnitude_option = st.radio(
-        "",
-        [
-            "No change from baseline (Score = 0)",
-            "≤ 5% increase (Score = 1)",
-            "≤ 50% increase (Score = 2)",
-            "≤ 100% increase (Score = 3)",
-            "> 100% increase (Score = 4)"
-        ],
-        index=0,
-        key="ed_magnitude_radio"
-    )
-    magnitude_score = {
-        "No change from baseline (Score = 0)": 0,
-        "≤ 5% increase (Score = 1)": 1,
-        "≤ 50% increase (Score = 2)": 2,
-        "≤ 100% increase (Score = 3)": 3,
-        "> 100% increase (Score = 4)": 4,
-    }[magnitude_option]
-    st.markdown(f"<span class='result-text'>Magnitude Score: {magnitude_score}</span>", unsafe_allow_html=True)
+    baseline_value = st.session_state.get(baseline_label, "Not Calculated")
+    st.markdown(f"**{baseline_label}:** {baseline_value}")
 
-    st.markdown("**OR, Estimate the Magnitude Qualitatively:**", unsafe_allow_html=True)
-    qualitative_option = st.selectbox(
-        "Qualitative Magnitude Score:",
-        [
-            "No impact (Score = 0)",
-            "≤ 1 day (Score = 1)",
-            "≤ 1 week (Score = 2)",
-            "≤ 2 weeks (Score = 3)",
-            "> 2 weeks (Score = 4)"
-        ],
-        index=0,
-        key="ed_qualitative_select"
-    )
-    qualitative_score = {
-        "No impact (Score = 0)": 0,
-        "≤ 1 day (Score = 1)": 1,
-        "≤ 1 week (Score = 2)": 2,
-        "≤ 2 weeks (Score = 3)": 3,
-        "> 2 weeks (Score = 4)": 4,
-    }[qualitative_option]
-    
-    # Display the calculated Duration Score
-    st.markdown("<span class='input-label'>Duration of Impact:</span>", unsafe_allow_html=True)
-    duration_option = st.selectbox(
-        "Duration Score:",
-        [
-            "No impact (Score = 0)",
-            "≤ 1 day (Score = 1)",
-            "≤ 1 week (Score = 2)",
-            "≤ 2 weeks (Score = 3)",
-            "> 2 weeks (Score = 4)"
-        ],
-        index=0,
-        key="ed_duration_select"
-    )
-    duration_score = {
-        "No impact (Score = 0)": 0,
-        "≤ 1 day (Score = 1)": 1,
-        "≤ 1 week (Score = 2)": 2,
-        "≤ 2 weeks (Score = 3)": 3,
-        "> 2 weeks (Score = 4)": 4,
-    }[duration_option]
-    
-    # Calculate ED Visits Score
-    ed_score = (qualitative_score + duration_score) / 2
-    
-    # Display Data Source / Explanation
-    st.text_area("Data Source / Explanation (Optional):", "In the VA Tech Massacre of 2007, 27 are known to have been treated at local emergency departments (Virginia Tech Review Panel, 2007).")
-    
-    # Display Resulting Scores
-    st.markdown(f"<span class='result-text'>Qualitative Magnitude Score: {qualitative_score}</span>", unsafe_allow_html=True)
-    st.markdown(f"<span class='result-text'>Duration Score: {duration_score}</span>", unsafe_allow_html=True)
-    st.markdown(f"<span class='result-text'>ED Visits Score: {ed_score}</span>", unsafe_allow_html=True)
+    # Hazard-Related Increase (editable by user)
+    hazard_increase = st.number_input(increase_label, value=0, key=f"{section_title}_hazard_increase")
 
-#****************************************************************************************************************************************************************************************************
-    
-    st.markdown("<h2 class='subheader'>Primary Care Office Visits</h2>", unsafe_allow_html=True)
-    
-    # Input fields
-    baseline_office_visits = st.number_input("Baseline Office Visits per Day:", value=0)
-    hazard_increase_office_visits = st.number_input("Hazard-Related Increase in Office Visits per Day:", value=0)
-    
-    st.markdown("<span class='input-label'>Magnitude Score:</span>", unsafe_allow_html=True)
-    magnitude_option = st.radio(
-        "",
-        [
-            "No change from baseline (Score = 0)",
-            "≤ 5% increase (Score = 1)",
-            "≤ 50% increase (Score = 2)",
-            "≤ 100% increase (Score = 3)",
-            "> 100% increase (Score = 4)"
-        ],
-        index=0,
-        key="office_magnitude_radio"
-    )
-    magnitude_score = {
-        "No change from baseline (Score = 0)": 0,
-        "≤ 5% increase (Score = 1)": 1,
-        "≤ 50% increase (Score = 2)": 2,
-        "≤ 100% increase (Score = 3)": 3,
-        "> 100% increase (Score = 4)": 4,
-    }[magnitude_option]
-    st.markdown(f"<span class='result-text'>Magnitude Score: {magnitude_score}</span>", unsafe_allow_html=True)
+    # Calculate Magnitude Score based on ED Visits logic
+    magnitude_score = calculate_magnitude_score(baseline_value, hazard_increase)
+    st.markdown(f"**Magnitude Score:** {magnitude_score}")
+    st.markdown("""
+        <ul>
+            <li>0: No change from baseline</li>
+            <li>1: ≤ 5% increase</li>
+            <li>2: ≤ 50% increase</li>
+            <li>3: ≤ 100% increase</li>
+            <li>4: > 100% increase</li>
+        </ul>
+    """, unsafe_allow_html=True)
 
-    st.markdown("**OR, Estimate the Magnitude Qualitatively:**", unsafe_allow_html=True)
-    qualitative_option = st.selectbox(
-        "Qualitative Magnitude Score:",
-        [
-            "No impact (Score = 0)",
-            "≤ 1 day (Score = 1)",
-            "≤ 1 week (Score = 2)",
-            "≤ 2 weeks (Score = 3)",
-            "> 2 weeks (Score = 4)"
-        ],
-        index=0,
-        key="office_qualitative_select"
-    )
-    qualitative_score = {
-        "No impact (Score = 0)": 0,
-        "≤ 1 day (Score = 1)": 1,
-        "≤ 1 week (Score = 2)": 2,
-        "≤ 2 weeks (Score = 3)": 3,
-        "> 2 weeks (Score = 4)": 4,
-    }[qualitative_option]
-    
-    # Display the calculated Duration Score
-    st.markdown("<span class='input-label'>Duration of Impact:</span>", unsafe_allow_html=True)
-    duration_option = st.selectbox(
-        "Duration Score:",
-        [
-            "No impact (Score = 0)",
-            "≤ 1 day (Score = 1)",
-            "≤ 1 week (Score = 2)",
-            "≤ 2 weeks (Score = 3)",
-            "> 2 weeks (Score = 4)"
-        ],
-        index=0,
-        key="office_duration_select"
-    )
-    duration_score = {
-        "No impact (Score = 0)": 0,
-        "≤ 1 day (Score = 1)": 1,
-        "≤ 1 week (Score = 2)": 2,
-        "≤ 2 weeks (Score = 3)": 3,
-        "> 2 weeks (Score = 4)": 4,
-    }[duration_option]
-    
-    # Calculate Primary Care Office Visits Score
-    office_score = (qualitative_score + duration_score) / 2
-    
-    # Display Data Source / Explanation
-    st.text_area("Data Source / Explanation (Optional):", "")
-    
-    # Display Resulting Scores
-    st.markdown(f"<span class='result-text'>Qualitative Magnitude Score: {qualitative_score}</span>", unsafe_allow_html=True)
-    st.markdown(f"<span class='result-text'>Duration Score: {duration_score}</span>", unsafe_allow_html=True)
-    st.markdown(f"<span class='result-text'>Primary Care Office Visits Score: {office_score}</span>", unsafe_allow_html=True)
-    
-    ###############################################
-    st.markdown("<h2 class='subheader'>Trauma Center Injuries</h2>", unsafe_allow_html=True)
-    baseline_trauma = st.number_input("Baseline Trauma Injuries per Day:", value=0)
-    hazard_increase_trauma = st.number_input("Hazard-Related Increase in Trauma Injuries per Day:", value=0)
+    # Qualitative Magnitude Score (user can select)
+    qualitative_option = st.selectbox("OR, Estimate the Magnitude Qualitatively:", 
+                                      ["Use Quantitative Value", "No change from baseline (Score = 0)", 
+                                       "≤ 5% increase (Score = 1)", "≤ 50% increase (Score = 2)", 
+                                       "≤ 100% increase (Score = 3)", ">100% increase (Score = 4)"], 
+                                      index=0, key=f"{section_title}_qualitative")
 
-    magnitude_option_trauma = st.radio(
-        "",
-        [
-            "No change from baseline (Score = 0)",
-            "≤ 5% increase (Score = 1)",
-            "≤ 50% increase (Score = 2)",
-            "≤ 100% increase (Score = 3)",
-            "> 100% increase (Score = 4)"
-        ],
-        index=0,
-        key="trauma_magnitude_radio"
-    )
-    magnitude_score_trauma = calculate_magnitude_score(magnitude_option_trauma)
-    st.markdown(f"<span class='result-text'>Magnitude Score: {magnitude_score_trauma}</span>", unsafe_allow_html=True)
+    # If qualitative option is not "Use Quantitative Value", extract the score
+    if qualitative_option != "Use Quantitative Value":
+        qualitative_score = int(qualitative_option.split("Score = ")[-1][0])
+    else:
+        qualitative_score = None
 
-    qualitative_option_trauma = st.selectbox(
-        "Qualitative Magnitude Score:",
-        [
-            "No impact (Score = 0)",
-            "≤ 1 day (Score = 1)",
-            "≤ 1 week (Score = 2)",
-            "≤ 2 weeks (Score = 3)",
-            "> 2 weeks (Score = 4)"
-        ],
-        index=0,
-        key="trauma_qualitative_select"
-    )
-    qualitative_score_trauma = calculate_duration_score(qualitative_option_trauma)
-    st.markdown(f"<span class='result-text'>Qualitative Magnitude Score: {qualitative_score_trauma}</span>", unsafe_allow_html=True)
+    # Duration of Impact (user can select)
+    duration_option = st.selectbox("Duration of Impact:", 
+                                   ["No impact (Score = 0)", "≤ 1 day (Score = 1)", 
+                                    "≤ 1 week (Score = 2)", "≤ 2 weeks (Score = 3)", 
+                                    "> 2 weeks (Score = 4)"], 
+                                   index=0, key=f"{section_title}_duration")
 
-    duration_option_trauma = st.selectbox(
-        "Duration Score:",
-        [
-            "No impact (Score = 0)",
-            "≤ 1 day (Score = 1)",
-            "≤ 1 week (Score = 2)",
-            "≤ 2 weeks (Score = 3)",
-            "> 2 weeks (Score = 4)"
-        ],
-        index=0,
-        key="trauma_duration_select"
-    )
-    duration_score_trauma = calculate_duration_score(duration_option_trauma)
-    st.markdown(f"<span class='result-text'>Duration Score: {duration_score_trauma}</span>", unsafe_allow_html=True)
+    # Calculate Duration Score
+    duration_score = int(duration_option.split("Score = ")[-1][0])
 
-    trauma_score = (qualitative_score_trauma + duration_score_trauma) / 2
-    st.text_area("Data Source / Explanation (Optional):", "In the VA Tech Massacre of 2007, 10 were taken to surgery at Level III trauma centers, and 2 at a Level I trauma center (Armstrong & Frykberg, 2007).")
-    st.markdown(f"<span class='result-text'>Trauma Center Injuries Score: {trauma_score}</span>", unsafe_allow_html=True)
+    # Data Source / Explanation (Optional)
+    st.text_area("Data Source / Explanation (Optional):", default_explanation, key=f"{section_title}_explanation")
 
-    st.markdown("<h2 class='subheader'>Mental Health Impact</h2>", unsafe_allow_html=True)
-    mental_health_option = st.selectbox(
-        "Mental Health Impact (Percent of population developing psychopathology and behavioral changes):",
-        [
-            "Minimal change in population behavior and negligible effects on social functioning.",
-            "Effects weak or highly transient; occasional or minor loss of nonessential social functions in a circumscribed geographical area.",
-            "Population displays distress with <25% psychopathology.",
-            "Population displays distress with 25% - 49% psychopathology.",
-            "Population displays distress with ≥50% psychopathology."
-        ],
-        index=2,
-        key="mental_health_select"
-    )
-    mental_health_score = calculate_magnitude_score(mental_health_option)
-    st.markdown(f"<span class='result-text'>Magnitude Score: {mental_health_score}</span>", unsafe_allow_html=True)
+    # Calculate final ED Visits score
+    if qualitative_score is None and magnitude_score == "Not calculated":
+        final_score = "Not Calculated/NA"
+    elif qualitative_score is not None:
+        final_score = (qualitative_score + duration_score) / 2
+    else:
+        final_score = (magnitude_score + duration_score) / 2
 
-    duration_option_mental = st.selectbox(
-        "Duration Score:",
-        [
-            "No impact (Score = 0)",
-            "≤ 1 day (Score = 1)",
-            "≤ 1 week (Score = 2)",
-            "≤ 2 weeks (Score = 3)",
-            "> 2 weeks (Score = 4)"
-        ],
-        index=0,
-        key="mental_duration_select"
-    )
-    duration_score_mental = calculate_duration_score(duration_option_mental)
-    st.text_area("Data Source / Explanation (Optional):", "After the VA Tech Massacre of 2007, 15.4% of VA Tech students screened showed high levels of posttraumatic stress symptoms (Hughes et al., 2011).")
-    st.markdown(f"<span class='result-text'>Mental Health Score: {(mental_health_score + duration_score_mental) / 2}</span>", unsafe_allow_html=True)
-
-    st.markdown("<h2 class='subheader'>Human Impact Score:</h2>", unsafe_allow_html=True)
-    st.markdown("<span class='result-text'>Not Calculated</span>", unsafe_allow_html=True)
-
-def calculate_magnitude_score(option):
-    scores = {
-        "No change from baseline (Score = 0)": 0,
-        "≤ 5% increase (Score = 1)": 1,
-        "≤ 50% increase (Score = 2)": 2,
-        "≤ 100% increase (Score = 3)": 3,
-        "> 100% increase (Score = 4)": 4,
-        "Population displays distress with <25% psychopathology.": 1,
-        "Population displays distress with 25% - 49% psychopathology.": 3,
-        "Population displays distress with ≥50% psychopathology.": 5
-    }
-    return scores.get(option, 0)
-
-def calculate_duration_score(option):
-    scores = {
-        "No impact (Score = 0)": 0,
-        "≤ 1 day (Score = 1)": 1,
-        "≤ 1 week (Score = 2)": 2,
-        "≤ 2 weeks (Score = 3)": 3,
-        "> 2 weeks (Score = 4)": 4,
-    }
-    return scores.get(option, 0)
-
+    # Display the final ED Visits score
+    st.markdown(f"**{section_title} Score:** {final_score}")
 
 # Run the function to display the webpage
 show()

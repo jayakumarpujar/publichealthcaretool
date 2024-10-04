@@ -2,21 +2,31 @@ import streamlit as st
 import json
 import os
 
-# Path to your JSON file
-json_file_path = 'form_data.json'
+# Path to the JSON file
+json_file_path = 'baseline_data.json'
 
 # Function to save data to a JSON file
-def save_data(data):
-    with open(json_file_path, 'w') as json_file:
-        json.dump(data, json_file, indent=4)
-
-# Function to load data from a JSON file
-def load_data():
+def save_data(data, key):
     if os.path.exists(json_file_path):
         with open(json_file_path, 'r') as json_file:
-            return json.load(json_file)
+            existing_data = json.load(json_file)
     else:
-        return {}
+        existing_data = {}
+
+    # Save form data under the provided key
+    existing_data[key] = data
+
+    # Write updated data back to the file
+    with open(json_file_path, 'w') as json_file:
+        json.dump(existing_data, json_file, indent=4)
+
+# Function to load data from a JSON file
+def load_data(key):
+    if os.path.exists(json_file_path):
+        with open(json_file_path, 'r') as json_file:
+            data = json.load(json_file)
+            return data.get(key, {})
+    return {}
 
 # Function to handle form submission
 def handle_form_submission():
@@ -59,12 +69,13 @@ def handle_form_submission():
         "Residential Population density of surrounding area": st.session_state.residential_population_density,
         "Daytime Population density of surrounding area": st.session_state.daytime_population_density,
     }
-    save_data(form_data)
+
+    save_data(form_data, key="community_characteristics")
     st.success("Form data saved successfully!")
 
 # Function to prefill form data
 def prefill_form():
-    form_data = load_data()
+    form_data = load_data("community_characteristics")
     for key, value in form_data.items():
         st.session_state[key.replace(" ", "_").lower()] = value
 
@@ -77,430 +88,49 @@ def show():
     # Prefill data if it exists
     prefill_form()
 
-    #st.markdown("<h2 class='header'>Community Characteristics</h2>", unsafe_allow_html=True)
-    st.markdown("""
-    <p class='subheader'>The following information will be used to develop hazard scenarios and estimate the impacts of various hazards on the jurisdiction.</p>
+    st.markdown("<h2 class='header'>Community Characteristics</h2>", unsafe_allow_html=True)
 
-    <div class="input-container">
-        <label class="label">Total Population:</label>
-        <input class="text-input" type="number" placeholder="Enter total population" value="0">
-    </div>
-    <div class="input-container">
-        <label class="label">Total Housing Units:</label>
-        <input class="text-input" type="number" placeholder="Enter total housing units">
-    </div>
-    <div class="input-container">
-        <label class="label">Percent Using Well Water:</label>
-        <input class="text-input" type="number" placeholder="Enter percentage using well water">
-    </div>
-    <div class="input-container">
-        <label class="label">Percent Under Age 40:</label>
-        <input class="text-input" type="number" placeholder="Enter percentage under age 40">
-    </div>
-    <div class="input-container">
-        <label class="label">Largest City or Population Center:</label>
-        <input class="text-input" type="text" placeholder="Enter largest city or population center">
-    </div>
-    <div class="input-container">
-        <label class="label">Population of Largest City or Population Center:</label>
-        <input class="text-input" type="number" placeholder="Enter population of largest city or population center">
-    </div>
-    <div class="input-container">
-        <label class="label">Population Density of Largest City (per sq mile):</label>
-        <input class="text-input" type="number" placeholder="Enter population density of largest city">
-    </div>
-    <div class="input-container">
-        <label class="label">Largest Hospital:</label>
-        <input class="text-input" type="text" placeholder="Enter name of largest hospital">
-    </div>
-    <div class="input-container">
-        <label class="label">ED Beds at Largest Hospital:</label>
-        <input class="text-input" type="number" placeholder="Enter number of ED beds at largest hospital">
-    </div>
-    <div class="input-container">
-        <label class="label">Total Beds at Largest Hospital:</label>
-        <input class="text-input" type="number" placeholder="Enter total beds at largest hospital">
-    </div>
-    <div class="input-container">
-        <label class="label">If Largest Hospital is a Trauma Center, Number of ORs (otherwise, 0):</label>
-        <input class="text-input" type="number" placeholder="Enter number of ORs if largest hospital is a trauma center">
-    </div>
-    <div class="input-container">
-        <label class="label">Another Hospital (Hospital 2):</label>
-        <input class="text-input" type="text" placeholder="Enter name of another hospital">
-    </div>
-    <div class="input-container">
-        <label class="label">ED Beds at Hospital 2:</label>
-        <input class="text-input" type="number" placeholder="Enter number of ED beds at hospital 2">
-    </div>
-    <div class="input-container">
-        <label class="label">Total Beds at Hospital 2:</label>
-        <input class="text-input" type="number" placeholder="Enter total beds at hospital 2">
-    </div>
-    <div class="input-container">
-        <label class="label">If Hospital 2 is a Trauma Center, Number of ORs (otherwise, 0):</label>
-        <input class="text-input" type="number" placeholder="Enter number of ORs if hospital 2 is a trauma center">
-    </div>
-    <div class="input-container">
-        <label class="label">Does any part of the region fall within a 50-mile radius of a nuclear reactor?</label>
-        <input class="text-input" type="text" placeholder="Enter Yes or No">
-    </div>
-    <div class="input-container">
-        <label class="label">Are there major transportation routes in the region within 10 miles of a nuclear reactor?</label>
-        <input class="text-input" type="text" placeholder="Enter Yes or No">
-    </div>
-    <div class="input-container">
-        <label class="label">Percent of region's businesses located within 10 miles of a nuclear reactor:</label>
-        <input class="text-input" type="number" placeholder="Enter percentage">
-    </div>
-    <div class="input-container">
-        <label class="label">Population within 10 Miles of a Nuclear Reactor:</label>
-        <input class="text-input" type="number" placeholder="Enter population within 10 miles of a nuclear reactor">
-    </div>
-    <div class="input-container">
-        <label class="label">Hospital(s) Within 10 Miles of a Nuclear Reactor:</label>
-        <input class="text-input" type="text" placeholder="Enter number of hospitals within 10 miles of a nuclear reactor">
-    </div>
-    <div class="input-container">
-        <label class="label">Total ED Beds at Hospital(s) Within 10 Miles of a Nuclear Reactor:</label>
-        <input class="text-input" type="number" placeholder="Enter number of ED beds within 10 miles of a nuclear reactor">
-    </div>
-    <div class="input-container">
-        <label class="label">ED Beds per 100,000 Within 10 Miles of a Nuclear Reactor:</label>
-        <textarea class="text-output" placeholder="Not Calculated" disabled></textarea>
-    </div>
-    <div class="input-container">
-        <label class="label">Total Beds at Hospital(s) Within 10 Miles of a Nuclear Reactor:</label>
-        <input class="text-input" type="number" placeholder="Enter number of total beds within 10 miles of a nuclear reactor">
-    </div>
-    <div class="input-container">
-        <label class="label">Beds per 100,000 Within 10 Miles of a Nuclear Reactor:</label>
-        <textarea class="text-output" placeholder="Not Calculated" disabled></textarea>
-    </div>
-    <div class="input-container">
-        <label class="label">FTE Nurses Employed at Hospital(s) Within 10 Miles of a Nuclear Reactor:</label>
-        <input class="text-input" type="number" placeholder="Enter number of FTE nurses within 10 miles of a nuclear reactor">
-    </div>
-    <div class="input-container">
-        <label class="label">If Hospital(s) Within 10 Miles of a Nuclear Reactor is a Trauma Center, Number of ORs (otherwise, 0):</label>
-        <input class="text-input" type="number" placeholder="Enter number of ORs if hospital within 10 miles is a trauma center">
-    </div>
-    <div class="input-container">
-        <label class="label">Nursing Home(s) Within 10 Miles of a Nuclear Reactor:</label>
-        <input class="text-input" type="number" placeholder="Enter number of nursing homes within 10 miles of a nuclear reactor">
-    </div>
-    <div class="input-container">
-        <label class="label">Total Beds at Nursing Home(s) Within 10 Miles of a Nuclear Reactor:</label>
-        <input class="text-input" type="number" placeholder="Enter number of total beds in nursing homes within 10 miles">
-    </div>
-    <div class="input-container">
-        <label class="label">PCPs Within 10 Miles of a Nuclear Reactor:</label>
-        <input class="text-input" type="number" placeholder="Enter number of PCPs within 10 miles of a nuclear reactor">
-    </div>
-    <div class="input-container">
-        <label class="label">PCPs per 100,000 Within 10 Miles of a Nuclear Reactor:</label>
-        <textarea class="text-output" placeholder="Not Calculated" disabled></textarea>
-    </div>
-    <div class="input-container">
-        <label class="label">Pharmacists Within 10 Miles of a Nuclear Reactor:</label>
-        <input class="text-input" type="number" placeholder="Enter number of pharmacists within 10 miles of a nuclear reactor">
-    </div>
-    <div class="input-container">
-        <label class="label">Pharmacists per 100,000 Within 10 Miles of a Nuclear Reactor:</label>
-        <textarea class="text-output" placeholder="Not Calculated" disabled></textarea>
-    </div>
-    <div class="input-container">
-        <label class="label">Mental Health Professionals Within 10 Miles of a Nuclear Reactor:</label>
-        <input class="text-input" type="number" placeholder="Enter number of mental health professionals within 10 miles">
-    </div>
-    <div class="input-container">
-        <label class="label">Mental Health Professionals per 100,000 Within 10 Miles of a Nuclear Reactor:</label>
-        <textarea class="text-output" placeholder="Not Calculated" disabled></textarea>
-    </div>
-    <div class="input-container">
-        <label class="label">Morgue Units Located Within 10 Miles of a Nuclear Reactor:</label>
-        <input class="text-input" type="number" placeholder="Enter number of morgue units within 10 miles of a nuclear reactor">
-    </div>
-    <div class="input-container">
-        <label class="label">Large College Campus:</label>
-        <input class="text-input" type="text" placeholder="Enter name of large college campus">
-    </div>
-    <div class="input-container">
-        <label class="label">Population Living on Large College Campus:</label>
-        <input class="text-input" type="number" placeholder="Enter population living on large college campus">
-    </div>
-    <div class="input-container">
-        <label class="label">What is a large public building or space that could be the target for a terrorist attack?</label>
-        <input class="text-input" type="text" placeholder="Enter name of large public building or space">
-    </div>
-    <div class="input-container">
-        <label class="label">How many people occupy this building/space at its busiest time?</label>
-        <input class="text-input" type="number" placeholder="Enter number of people">
-    </div>
-    <div class="input-container">
-        <label class="label"> Residental Population density of surrounding area (per square mile):</label>
-        <input class="text-input" type="number" placeholder="Enter number of people">
-    </div>
-    <div class="input-container">
-        <label class="label">Daytime Population density of surrounding area (per square mile):  </label>
-        <input class="text-input" type="number" placeholder="Enter number of people">
-    </div>              
-    
-    """, unsafe_allow_html=True)
-
-
+    # Add input fields
+    st.text_input("Total Population", key="total_population")
+    st.text_input("Total Housing Units", key="total_housing_units")
+    st.text_input("Percent Using Well Water", key="percent_using_well_water")
+    st.text_input("Percent Under Age 40", key="percent_under_age_40")
+    st.text_input("Largest City or Population Center", key="largest_city")
+    st.text_input("Population of Largest City or Population Center", key="population_of_largest_city")
+    st.text_input("Population Density of Largest City (per sq mile)", key="population_density_of_largest_city")
+    st.text_input("Largest Hospital", key="largest_hospital")
+    st.text_input("ED Beds at Largest Hospital", key="ed_beds_largest_hospital")
+    st.text_input("Total Beds at Largest Hospital", key="total_beds_largest_hospital")
+    st.text_input("If Largest Hospital is a Trauma Center, Number of ORs", key="ors_largest_hospital")
+    st.text_input("Another Hospital (Hospital 2)", key="hospital_2")
+    st.text_input("ED Beds at Hospital 2", key="ed_beds_hospital_2")
+    st.text_input("Total Beds at Hospital 2", key="total_beds_hospital_2")
+    st.text_input("If Hospital 2 is a Trauma Center, Number of ORs", key="ors_hospital_2")
+    st.text_input("Region falls within 50-mile radius of nuclear reactor", key="within_50_miles_nuclear")
+    st.text_input("Major transportation routes within 10 miles of nuclear reactor", key="transportation_routes_within_10_miles")
+    st.text_input("Percent of region's businesses within 10 miles of nuclear reactor", key="businesses_within_10_miles")
+    st.text_input("Population within 10 Miles of a Nuclear Reactor", key="population_within_10_miles")
+    st.text_input("Hospitals Within 10 Miles of a Nuclear Reactor", key="hospitals_within_10_miles")
+    st.text_input("Total ED Beds at Hospital(s) Within 10 Miles of a Nuclear Reactor", key="ed_beds_within_10_miles")
+    st.text_input("Total Beds at Hospital(s) Within 10 Miles of a Nuclear Reactor", key="total_beds_within_10_miles")
+    st.text_input("FTE Nurses Employed at Hospital(s) Within 10 Miles of a Nuclear Reactor", key="fte_nurses_within_10_miles")
+    st.text_input("If Hospitals Within 10 Miles of Nuclear Reactor is a Trauma Center, Number of ORs", key="ors_within_10_miles")
+    st.text_input("Nursing Homes Within 10 Miles of a Nuclear Reactor", key="nursing_homes_within_10_miles")
+    st.text_input("Total Beds at Nursing Homes Within 10 Miles of a Nuclear Reactor", key="total_beds_nursing_homes_within_10_miles")
+    st.text_input("PCPs Within 10 Miles of a Nuclear Reactor", key="pcps_within_10_miles")
+    st.text_input("Pharmacists Within 10 Miles of a Nuclear Reactor", key="pharmacists_within_10_miles")
+    st.text_input("Mental Health Professionals Within 10 Miles of a Nuclear Reactor", key="mental_health_professionals_within_10_miles")
+    st.text_input("Morgue Units Located Within 10 Miles of a Nuclear Reactor", key="morgue_units_within_10_miles")
+    st.text_input("Large College Campus", key="large_college_campus")
+    st.text_input("Population Living on Large College Campus", key="population_living_on_campus")
+    st.text_input("Large public building or space target for terrorist attack", key="terrorist_target")
+    st.text_input("People occupy building/space at its busiest time", key="people_occupy_space")
+    st.text_input("Residential Population density of surrounding area", key="residential_population_density")
+    st.text_input("Daytime Population density of surrounding area", key="daytime_population_density")
 
     # Button to submit and save form data
     if st.button("Save Data"):
         handle_form_submission()
 
+# Run the page
 show()
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# import streamlit as st
-
-# def show():
-#     # Define CSS style for improved visuals
-#     st.markdown("""
-#     <style>
-#         body {
-#             background-color: #f5f5f5;
-#         }
-#         .main {
-#             background-color: #e6e6fa;
-#             padding: 20px;
-#             border-radius: 10px;
-#         }
-#         .input-container {
-#             background-color: #ffe4e1;
-#             padding: 20px;
-#             border-radius: 10px;
-#             margin: 10px 0;
-#         }
-#         .header {
-#             text-align: center;
-#             color: #333333;
-#             font-size: 24px;
-#             margin-top: 10px;
-#         }
-#         .subheader {
-#             color: #333333;
-#             font-size: 18px;
-#             margin-top: 10px;
-#         }
-#         .label {
-#             font-weight: bold;
-#         }
-#         .text-input {
-#             width: 100%;
-#             padding: 10px;
-#             margin: 5px 0;
-#             border-radius: 5px;
-#             border: 1px solid #cccccc;
-#         }
-#         .text-output {
-#             width: 100%;
-#             padding: 10px;
-#             margin: 5px 0;
-#             border-radius: 5px;
-#             border: 1px solid #cccccc;
-#             background-color: #f5f5f5;
-#             color: #333333;
-#         }
-#         .row {
-#             display: flex;
-#             flex-wrap: wrap;
-#             justify-content: space-between;
-#         }
-#         .column {
-#             flex: 0 0 48%;
-#             box-sizing: border-box;
-#         }
-#     </style>
-#     """, unsafe_allow_html=True)
-
-#     #st.markdown("<h2 class='header'>Community Characteristics</h2>", unsafe_allow_html=True)
-#     st.markdown("""
-#     <p class='subheader'>The following information will be used to develop hazard scenarios and estimate the impacts of various hazards on the jurisdiction.</p>
-
-#     <div class="input-container">
-#         <label class="label">Total Population:</label>
-#         <input class="text-input" type="number" placeholder="Enter total population" value="0">
-#     </div>
-#     <div class="input-container">
-#         <label class="label">Total Housing Units:</label>
-#         <input class="text-input" type="number" placeholder="Enter total housing units">
-#     </div>
-#     <div class="input-container">
-#         <label class="label">Percent Using Well Water:</label>
-#         <input class="text-input" type="number" placeholder="Enter percentage using well water">
-#     </div>
-#     <div class="input-container">
-#         <label class="label">Percent Under Age 40:</label>
-#         <input class="text-input" type="number" placeholder="Enter percentage under age 40">
-#     </div>
-#     <div class="input-container">
-#         <label class="label">Largest City or Population Center:</label>
-#         <input class="text-input" type="text" placeholder="Enter largest city or population center">
-#     </div>
-#     <div class="input-container">
-#         <label class="label">Population of Largest City or Population Center:</label>
-#         <input class="text-input" type="number" placeholder="Enter population of largest city or population center">
-#     </div>
-#     <div class="input-container">
-#         <label class="label">Population Density of Largest City (per sq mile):</label>
-#         <input class="text-input" type="number" placeholder="Enter population density of largest city">
-#     </div>
-#     <div class="input-container">
-#         <label class="label">Largest Hospital:</label>
-#         <input class="text-input" type="text" placeholder="Enter name of largest hospital">
-#     </div>
-#     <div class="input-container">
-#         <label class="label">ED Beds at Largest Hospital:</label>
-#         <input class="text-input" type="number" placeholder="Enter number of ED beds at largest hospital">
-#     </div>
-#     <div class="input-container">
-#         <label class="label">Total Beds at Largest Hospital:</label>
-#         <input class="text-input" type="number" placeholder="Enter total beds at largest hospital">
-#     </div>
-#     <div class="input-container">
-#         <label class="label">If Largest Hospital is a Trauma Center, Number of ORs (otherwise, 0):</label>
-#         <input class="text-input" type="number" placeholder="Enter number of ORs if largest hospital is a trauma center">
-#     </div>
-#     <div class="input-container">
-#         <label class="label">Another Hospital (Hospital 2):</label>
-#         <input class="text-input" type="text" placeholder="Enter name of another hospital">
-#     </div>
-#     <div class="input-container">
-#         <label class="label">ED Beds at Hospital 2:</label>
-#         <input class="text-input" type="number" placeholder="Enter number of ED beds at hospital 2">
-#     </div>
-#     <div class="input-container">
-#         <label class="label">Total Beds at Hospital 2:</label>
-#         <input class="text-input" type="number" placeholder="Enter total beds at hospital 2">
-#     </div>
-#     <div class="input-container">
-#         <label class="label">If Hospital 2 is a Trauma Center, Number of ORs (otherwise, 0):</label>
-#         <input class="text-input" type="number" placeholder="Enter number of ORs if hospital 2 is a trauma center">
-#     </div>
-#     <div class="input-container">
-#         <label class="label">Does any part of the region fall within a 50-mile radius of a nuclear reactor?</label>
-#         <input class="text-input" type="text" placeholder="Enter Yes or No">
-#     </div>
-#     <div class="input-container">
-#         <label class="label">Are there major transportation routes in the region within 10 miles of a nuclear reactor?</label>
-#         <input class="text-input" type="text" placeholder="Enter Yes or No">
-#     </div>
-#     <div class="input-container">
-#         <label class="label">Percent of region's businesses located within 10 miles of a nuclear reactor:</label>
-#         <input class="text-input" type="number" placeholder="Enter percentage">
-#     </div>
-#     <div class="input-container">
-#         <label class="label">Population within 10 Miles of a Nuclear Reactor:</label>
-#         <input class="text-input" type="number" placeholder="Enter population within 10 miles of a nuclear reactor">
-#     </div>
-#     <div class="input-container">
-#         <label class="label">Hospital(s) Within 10 Miles of a Nuclear Reactor:</label>
-#         <input class="text-input" type="text" placeholder="Enter number of hospitals within 10 miles of a nuclear reactor">
-#     </div>
-#     <div class="input-container">
-#         <label class="label">Total ED Beds at Hospital(s) Within 10 Miles of a Nuclear Reactor:</label>
-#         <input class="text-input" type="number" placeholder="Enter number of ED beds within 10 miles of a nuclear reactor">
-#     </div>
-#     <div class="input-container">
-#         <label class="label">ED Beds per 100,000 Within 10 Miles of a Nuclear Reactor:</label>
-#         <textarea class="text-output" placeholder="Not Calculated" disabled></textarea>
-#     </div>
-#     <div class="input-container">
-#         <label class="label">Total Beds at Hospital(s) Within 10 Miles of a Nuclear Reactor:</label>
-#         <input class="text-input" type="number" placeholder="Enter number of total beds within 10 miles of a nuclear reactor">
-#     </div>
-#     <div class="input-container">
-#         <label class="label">Beds per 100,000 Within 10 Miles of a Nuclear Reactor:</label>
-#         <textarea class="text-output" placeholder="Not Calculated" disabled></textarea>
-#     </div>
-#     <div class="input-container">
-#         <label class="label">FTE Nurses Employed at Hospital(s) Within 10 Miles of a Nuclear Reactor:</label>
-#         <input class="text-input" type="number" placeholder="Enter number of FTE nurses within 10 miles of a nuclear reactor">
-#     </div>
-#     <div class="input-container">
-#         <label class="label">If Hospital(s) Within 10 Miles of a Nuclear Reactor is a Trauma Center, Number of ORs (otherwise, 0):</label>
-#         <input class="text-input" type="number" placeholder="Enter number of ORs if hospital within 10 miles is a trauma center">
-#     </div>
-#     <div class="input-container">
-#         <label class="label">Nursing Home(s) Within 10 Miles of a Nuclear Reactor:</label>
-#         <input class="text-input" type="number" placeholder="Enter number of nursing homes within 10 miles of a nuclear reactor">
-#     </div>
-#     <div class="input-container">
-#         <label class="label">Total Beds at Nursing Home(s) Within 10 Miles of a Nuclear Reactor:</label>
-#         <input class="text-input" type="number" placeholder="Enter number of total beds in nursing homes within 10 miles">
-#     </div>
-#     <div class="input-container">
-#         <label class="label">PCPs Within 10 Miles of a Nuclear Reactor:</label>
-#         <input class="text-input" type="number" placeholder="Enter number of PCPs within 10 miles of a nuclear reactor">
-#     </div>
-#     <div class="input-container">
-#         <label class="label">PCPs per 100,000 Within 10 Miles of a Nuclear Reactor:</label>
-#         <textarea class="text-output" placeholder="Not Calculated" disabled></textarea>
-#     </div>
-#     <div class="input-container">
-#         <label class="label">Pharmacists Within 10 Miles of a Nuclear Reactor:</label>
-#         <input class="text-input" type="number" placeholder="Enter number of pharmacists within 10 miles of a nuclear reactor">
-#     </div>
-#     <div class="input-container">
-#         <label class="label">Pharmacists per 100,000 Within 10 Miles of a Nuclear Reactor:</label>
-#         <textarea class="text-output" placeholder="Not Calculated" disabled></textarea>
-#     </div>
-#     <div class="input-container">
-#         <label class="label">Mental Health Professionals Within 10 Miles of a Nuclear Reactor:</label>
-#         <input class="text-input" type="number" placeholder="Enter number of mental health professionals within 10 miles">
-#     </div>
-#     <div class="input-container">
-#         <label class="label">Mental Health Professionals per 100,000 Within 10 Miles of a Nuclear Reactor:</label>
-#         <textarea class="text-output" placeholder="Not Calculated" disabled></textarea>
-#     </div>
-#     <div class="input-container">
-#         <label class="label">Morgue Units Located Within 10 Miles of a Nuclear Reactor:</label>
-#         <input class="text-input" type="number" placeholder="Enter number of morgue units within 10 miles of a nuclear reactor">
-#     </div>
-#     <div class="input-container">
-#         <label class="label">Large College Campus:</label>
-#         <input class="text-input" type="text" placeholder="Enter name of large college campus">
-#     </div>
-#     <div class="input-container">
-#         <label class="label">Population Living on Large College Campus:</label>
-#         <input class="text-input" type="number" placeholder="Enter population living on large college campus">
-#     </div>
-#     <div class="input-container">
-#         <label class="label">What is a large public building or space that could be the target for a terrorist attack?</label>
-#         <input class="text-input" type="text" placeholder="Enter name of large public building or space">
-#     </div>
-#     <div class="input-container">
-#         <label class="label">How many people occupy this building/space at its busiest time?</label>
-#         <input class="text-input" type="number" placeholder="Enter number of people">
-#     </div>
-#     <div class="input-container">
-#         <label class="label"> Residental Population density of surrounding area (per square mile):</label>
-#         <input class="text-input" type="number" placeholder="Enter number of people">
-#     </div>
-#     <div class="input-container">
-#         <label class="label">Daytime Population density of surrounding area (per square mile):  </label>
-#         <input class="text-input" type="number" placeholder="Enter number of people">
-#     </div>              
-    
-#     """, unsafe_allow_html=True)
-
-# show(
