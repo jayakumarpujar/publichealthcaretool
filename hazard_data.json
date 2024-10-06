@@ -1,9 +1,99 @@
 {
-    "Hazard-Related Increase in Mortality per Day": 0.0,
-    "Hazard-Related Increase in Mortality": 0.0,
-    "Hazard-Related Increase in EMS Transports": 0.0,
-    "Hazard-Related Increase in ED Visits": 0.0,
-    "Hazard-Related Increase in Primary Care Office Visits": 0.0,
-    "Hazard-Related Increase in Trauma Center Injuries": 0.0,
-    "Hazard-Related Increase in Mental Health Impact": 0.0
+    "probability_data": {
+        "probability_score": 3
+    },
+    "Mortality": {
+        "baseline": 99.0,
+        "hazard_increase": 77,
+        "magnitude_score": 3
+    },
+    "Mortality_final": {
+        "final_score": 2.0
+    },
+    "EMS Transports": {
+        "baseline": 77.0,
+        "hazard_increase": 87,
+        "magnitude_score": 4
+    },
+    "EMS Transports_final": {
+        "final_score": 2.0
+    },
+    "ED Visits": {
+        "baseline": 77.0,
+        "hazard_increase": 87,
+        "magnitude_score": 4
+    },
+    "ED Visits_final": {
+        "final_score": 1.5
+    },
+    "Primary Care Office Visits": {
+        "baseline": 77.0,
+        "hazard_increase": 97,
+        "magnitude_score": 4
+    },
+    "Primary Care Office Visits_final": {
+        "final_score": 1.5
+    },
+    "Trauma Center Injuries": {
+        "baseline": 77.0,
+        "hazard_increase": 98,
+        "magnitude_score": 4
+    },
+    "Trauma Center Injuries_final": {
+        "final_score": 2.0
+    },
+    "Outpatient Services": {
+        "baseline": 77.0,
+        "hazard_increase": 4.85,
+        "hazard_loss_value": 87,
+        "magnitude_score": 4
+    },
+    "Outpatient Services_final": {
+        "final_score": 2.0
+    },
+    "ED Services": {
+        "baseline": 77.0,
+        "hazard_increase": 19.333333333333332,
+        "hazard_loss_value": 97,
+        "magnitude_score": 4
+    },
+    "ED Services_final": {
+        "final_score": 2.5
+    },
+    "Hospital Beds": {
+        "baseline": 77.0,
+        "hazard_increase": 23,
+        "hazard_loss_value": 94,
+        "magnitude_score": 4
+    },
+    "Hospital Beds_final": {
+        "final_score": 1.5
+    },
+    "Ancillary Services": {
+        "baseline": 77.0,
+        "hazard_increase": 33,
+        "hazard_loss_value": 22,
+        "magnitude_score": 3
+    },
+    "Ancillary Services_final": {
+        "final_score": 2.5
+    },
+    "Trauma Units": {
+        "baseline": 87.0,
+        "hazard_increase": 98,
+        "hazard_loss_value": 32,
+        "magnitude_score": 4
+    },
+    "Trauma Units_final": {
+        "final_score": 2.5
+    },
+    "Mental Health Services": {
+        "baseline": 76.0,
+        "hazard_increase": 32,
+        "hazard_loss_value": 45,
+        "magnitude_score": 4
+    },
+    "Mental Health Services_final": {
+        "final_score": 3.0
+    }
 }
