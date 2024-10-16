@@ -1,99 +1,186 @@
 {
     "probability_data": {
-        "probability_score": 3
+        "probability_score": 2
     },
     "Mortality": {
-        "baseline": 99.0,
-        "hazard_increase": 77,
-        "magnitude_score": 3
+        "baseline": 0.0,
+        "duration_score": 0,
+        "hazard_increase": 0,
+        "magnitude_score": "Not calculated"
     },
     "Mortality_final": {
-        "final_score": 2.0
+        "final_score": "Not Calculated/NA"
     },
     "EMS Transports": {
-        "baseline": 77.0,
-        "hazard_increase": 87,
-        "magnitude_score": 4
+        "baseline": 0.0,
+        "duration_score": 0,
+        "hazard_increase": 0,
+        "magnitude_score": "Not calculated"
     },
     "EMS Transports_final": {
-        "final_score": 2.0
+        "final_score": "Not Calculated/NA"
     },
     "ED Visits": {
-        "baseline": 77.0,
-        "hazard_increase": 87,
-        "magnitude_score": 4
+        "baseline": 0.0,
+        "hazard_increase": 0,
+        "magnitude_score": "Not calculated"
     },
     "ED Visits_final": {
-        "final_score": 1.5
+        "final_score": "Not Calculated/NA"
     },
     "Primary Care Office Visits": {
-        "baseline": 77.0,
-        "hazard_increase": 97,
-        "magnitude_score": 4
+        "baseline": 0.0,
+        "hazard_increase": 0,
+        "magnitude_score": "Not calculated"
     },
     "Primary Care Office Visits_final": {
-        "final_score": 1.5
+        "final_score": "Not Calculated/NA"
     },
     "Trauma Center Injuries": {
-        "baseline": 77.0,
-        "hazard_increase": 98,
-        "magnitude_score": 4
+        "baseline": 0.0,
+        "hazard_increase": 0,
+        "magnitude_score": "Not calculated"
     },
     "Trauma Center Injuries_final": {
-        "final_score": 2.0
+        "final_score": "Not Calculated/NA"
     },
     "Outpatient Services": {
-        "baseline": 77.0,
-        "hazard_increase": 4.85,
-        "hazard_loss_value": 87,
-        "magnitude_score": 4
+        "baseline": 0.0,
+        "hazard_increase": 0.0,
+        "hazard_loss_value": 0,
+        "magnitude_score": "Not calculated"
     },
     "Outpatient Services_final": {
-        "final_score": 2.0
+        "final_score": "Not Calculated/NA"
     },
     "ED Services": {
-        "baseline": 77.0,
-        "hazard_increase": 19.333333333333332,
-        "hazard_loss_value": 97,
-        "magnitude_score": 4
+        "baseline": 0.0,
+        "hazard_increase": 0.0,
+        "hazard_loss_value": 0,
+        "magnitude_score": "Not calculated"
     },
     "ED Services_final": {
-        "final_score": 2.5
+        "final_score": "Not Calculated/NA"
     },
     "Hospital Beds": {
-        "baseline": 77.0,
-        "hazard_increase": 23,
-        "hazard_loss_value": 94,
-        "magnitude_score": 4
+        "baseline": 0.0,
+        "hazard_increase": 0,
+        "hazard_loss_value": 0,
+        "magnitude_score": "Not calculated"
     },
     "Hospital Beds_final": {
-        "final_score": 1.5
+        "final_score": "Not Calculated/NA"
     },
     "Ancillary Services": {
-        "baseline": 77.0,
-        "hazard_increase": 33,
-        "hazard_loss_value": 22,
-        "magnitude_score": 3
+        "baseline": 0.0,
+        "hazard_increase": 0,
+        "hazard_loss_value": 0,
+        "magnitude_score": "Not calculated"
     },
     "Ancillary Services_final": {
-        "final_score": 2.5
+        "final_score": "Not Calculated/NA"
     },
     "Trauma Units": {
-        "baseline": 87.0,
-        "hazard_increase": 98,
-        "hazard_loss_value": 32,
-        "magnitude_score": 4
+        "baseline": 0.0,
+        "hazard_increase": 0,
+        "hazard_loss_value": 0,
+        "magnitude_score": "Not calculated"
     },
     "Trauma Units_final": {
-        "final_score": 2.5
+        "final_score": "Not Calculated/NA"
     },
     "Mental Health Services": {
-        "baseline": 76.0,
-        "hazard_increase": 32,
-        "hazard_loss_value": 45,
-        "magnitude_score": 4
+        "baseline": 0.0,
+        "hazard_increase": 0,
+        "hazard_loss_value": 0,
+        "magnitude_score": "Not calculated"
     },
     "Mental Health Services_final": {
+        "final_score": "Not Calculated/NA"
+    },
+    "Human Impact Score": {
+        "final_score": "Not Calculated"
+    },
+    "Mental Health Impact_final": {
         "final_score": 3.0
+    },
+    "Mental Health Impact": {
+        "duration_score": 2,
+        "magnitude_score": 4
+    },
+    "Hospital Personnel": {
+        "baseline_rns": 0.0,
+        "hazard_loss_rns": 0.0,
+        "hazard_increase_patients": 0,
+        "hazard_patient_nurse_ratio": "No Nurses",
+        "magnitude_score": "Not Calculated",
+        "duration_score": 3,
+        "final_score": "Not Calculated/NA"
+    },
+    "Facility Water Supply": {
+        "beds_impacted": 0,
+        "total_beds": 0.0,
+        "percent_impacted": "Not Calculated",
+        "magnitude_score": 0,
+        "duration_score": 0,
+        "final_score": 0.0
+    },
+    "Facility Electricity": {
+        "beds_impacted": 0,
+        "total_beds": 0.0,
+        "percent_impacted": "Not Calculated",
+        "magnitude_score": 0,
+        "duration_score": 0,
+        "final_score": 0.0
+    },
+    "Facility Generator Fuel Supply": {
+        "baseline_rns_per_shift": 0.0,
+        "hazard_loss_rns": 0.0,
+        "baseline_patients_per_day": 0.0,
+        "hazard_increase_patients_per_day": 0,
+        "hazard_patient_nurse_ratio": "No Nurses",
+        "magnitude_score": "Not Calculated",
+        "duration_score": 0,
+        "final_score": "Not Calculated/NA"
+    },
+    "Hospital IT/Communication Systems": {
+        "baseline_rns_per_shift": 0.0,
+        "hazard_loss_rns": 0.0,
+        "baseline_patients_per_day": 0.0,
+        "hazard_increase_patients_per_day": 0,
+        "hazard_patient_nurse_ratio": "No Nurses",
+        "magnitude_score": "Not Calculated",
+        "duration_score": 0,
+        "final_score": "Not Calculated/NA"
+    },
+    "Facility Critical Supplies": {
+        "baseline_rns_per_shift": 0.0,
+        "hazard_loss_rns": 0.0,
+        "baseline_patients_per_day": 0.0,
+        "hazard_increase_patients_per_day": 0,
+        "hazard_patient_nurse_ratio": "No Nurses",
+        "magnitude_score": "Not Calculated",
+        "duration_score": 0,
+        "final_score": "Not Calculated/NA"
+    },
+    "Facility Evacuation": {
+        "baseline_rns_per_shift": 0.0,
+        "hazard_loss_rns": 0.0,
+        "baseline_patients_per_day": 0.0,
+        "hazard_increase_patients_per_day": 0,
+        "hazard_patient_nurse_ratio": "No Nurses",
+        "magnitude_score": "Not Calculated",
+        "duration_score": 0,
+        "final_score": "Not Calculated/NA"
+    },
+    "Hospital Patient Decontamination": {
+        "baseline_rns_per_shift": 0.0,
+        "hazard_loss_rns": 0.0,
+        "baseline_patients_per_day": 0.0,
+        "hazard_increase_patients_per_day": 0,
+        "hazard_patient_nurse_ratio": "No Nurses",
+        "magnitude_score": "Not Calculated",
+        "duration_score": 0,
+        "final_score": "Not Calculated/NA"
     }
 }

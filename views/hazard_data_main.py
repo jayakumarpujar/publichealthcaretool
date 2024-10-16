@@ -8,7 +8,6 @@ from views.hazard_data import (
     conventional_explosive,
     cyber_terrorism,
     drought,
-    earthquake,
     fire,
     flood,
     hazardous_materials_release,
@@ -66,8 +65,6 @@ def show():
         cyber_terrorism.show()
     elif option == "drought":
         drought.show()
-    elif option == "earthquake":
-        earthquake.show()
     elif option == "fire":
         fire.show()
     elif option == "flood":

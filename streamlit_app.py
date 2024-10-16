@@ -15,6 +15,7 @@ page = st.sidebar.radio("Go to", ["Main Menu", "Baseline Data", "Hazard Data", "
 # Navigate to selected page
 navigate(page)
 
+
 # Footer
 st.markdown("<div class='footer'>© 2024 Public Health Risk Assessment Tool</div>", unsafe_allow_html=True)
 st.markdown("---")
