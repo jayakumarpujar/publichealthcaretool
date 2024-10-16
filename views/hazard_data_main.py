@@ -3,22 +3,19 @@ from views.hazard_data import (
     active_shooter,
     biological_terrosim,
     chemical_terrosim,
-    civil_disturbance,
-    coastal_storm,
-    conventional_explosive,
+    accidental_explosive,
     cyber_terrorism,
     drought,
     fire,
     flood,
     hazardous_materials_release,
-    localized_infectious_disease,
-    nuclear_facility_accident,
-    pandemic,
-    radiation_disperal_device,
+    infectious_disease,
+    intentional_explosive,
+    radiation_dispersal_device,
     temperature_extremes,
     tornado,
     utility_interruption,
-    winter_strom
+    winter_storm
 )
 
 def show():
@@ -30,23 +27,19 @@ def show():
     "active_shooter",
     "biological_terrosim",
     "chemical_terrosim",
-    "civil_disturbance",
-    "coastal_storm",
-    "conventional_explosive",
+    "accidental_explosive",
     "cyber_terrorism",
     "drought",
-    "earthquake",
     "fire",
     "flood",
     "hazardous_materials_release",
-    "localized_infectious_disease",
-    "nuclear_facility_accident",
-    "pandemic",
-    "radiation_disperal_device",
+    "infectious_disease",
+    "intentional_explosive",
+    "radiation_dispersal_device",
     "temperature_extremes",
     "tornado",
     "utility_interruption",
-    "winter_strom"
+    "winter_storm"
     ])
 
     if option == "active_shooter":
@@ -55,12 +48,8 @@ def show():
         biological_terrosim.show()
     elif option == "chemical_terrosim":
         chemical_terrosim.show()
-    elif option == "civil_disturbance":
-        civil_disturbance.show()
-    elif option == "coastal_storm":
-        coastal_storm.show()
-    elif option == "conventional_explosive":
-        conventional_explosive.show()
+    elif option == "accidental_explosive":
+        accidental_explosive.show()
     elif option == "cyber_terrorism":
         cyber_terrorism.show()
     elif option == "drought":
@@ -71,5 +60,17 @@ def show():
         flood.show()
     elif option == "hazardous_materials_release":
         hazardous_materials_release.show()
-    elif option == "localized_infectious_disease":
-        localized_infectious_disease.show()
+    elif option == "infectious_disease":
+        infectious_disease.show()
+    elif option == "intentional_explosive":
+        intentional_explosive.show()
+    elif option == "radiation_dispersal_device":
+        radiation_dispersal_device.show()
+    elif option == "temperature_extremes":
+        temperature_extremes.show()
+    elif option == "tornado":
+        tornado.show()
+    elif option == "utility_interruption":
+        utility_interruption.show()
+    elif option == "winter_storm":
+        winter_storm.show()       

@@ -5,7 +5,7 @@ import json
 from views.baseline_data.community_characteristics import handle_form_submission
 
 # Paths to your JSON files
-HazMat_data_file = 'HazMat_data.json'
+AccExp_data_file = 'AccExp_data.json'
 baseline_data_file = 'baseline_data.json'
 
 # Function to load data from the baseline_data.json file
@@ -23,10 +23,10 @@ def load_baseline_data():
         return {}
 
 
-# Function to load data from the HazMat_data.json file
-def load_HazMat_data():
-    if os.path.exists(HazMat_data_file):
-        with open(HazMat_data_file, 'r') as file:
+# Function to load data from the AccExp_data.json file
+def load_AccExp_data():
+    if os.path.exists(AccExp_data_file):
+        with open(AccExp_data_file, 'r') as file:
             try:
                 data = json.load(file)
                 return data
@@ -35,12 +35,12 @@ def load_HazMat_data():
                 return {}
     return {}
 
-# Function to save data to the HazMat_data.json file
+# Function to save data to the AccExp_data.json file
 def save_data(page_key, data):
     try:
-        # Load existing data from the HazMat_data.json file
-        if os.path.exists(HazMat_data_file):
-            with open(HazMat_data_file, 'r') as file:
+        # Load existing data from the AccExp_data.json file
+        if os.path.exists(AccExp_data_file):
+            with open(AccExp_data_file, 'r') as file:
                 existing_data = json.load(file)
         else:
             existing_data = {}
@@ -49,7 +49,7 @@ def save_data(page_key, data):
         existing_data[page_key] = data
 
         # Save updated data back to the file
-        with open(HazMat_data_file, 'w') as file:
+        with open(AccExp_data_file, 'w') as file:
             json.dump(existing_data, file, indent=4)
 
         st.success("Data saved successfully!")
@@ -144,17 +144,24 @@ def show():
     # Prefill the form if data exists
     prefill_form()
     # Load hazard data from file
-    HazMat_data = load_HazMat_data()
+    AccExp_data = load_AccExp_data()
 
     st.markdown("""
-    <p>The improper leak, spillage, discharge, or disposal of hazardous materials or substances (such as explosives, toxic chemicals, and 
-    radioactive materials) poses a significant threat to human health and safety, campus property, and the surrounding environment. IHEs 
-    should use these resources to evaluate and improve their preparedness for all types of HAZMAT-related incidents, including both accidental 
-    spills and intentional acts of criminality or terrorism (U.S. Department of Homeland Security, n.d.).</p>
+    <p>Any chemical compound, mixture, or device, the primary or common purpose of which is to function by explosion, i.e., with 
+    substantially instantaneous release of gas and heat, unless such compound, mixture, or device is otherwise specifically classified 
+    by the U.S. Department of Transportation; see 49 CFR chapter I. The term “explosives” shall include all material which is classified 
+    as Class A, Class B, and Class C explosives by the U.S. Department of Transportation, and includes, but is not limited to dynamite,
+    black powder, pellet powders, initiating explosives, blasting caps, electric blasting caps, safety fuse, fuse lighters, fuse igniters, 
+    squibs, cordeau detonant fuse, instantaneous fuse, igniter cord, igniters, small arms ammunition, small arms ammunition primers, 
+    smokeless propellant, cartridges for propellant-actuated power devices, and cartridges for industrial guns. Commercial explosives are 
+    those explosives which are intended to be used in commercial or industrial operations (U.S. Department of Labor, n.d.).</p>
+    <p>The following hazard impacts have been estimated using historical data, predictive models, estimations where necessary, and 
+    the information entered in the "Baseline Data" worksheets. The information below can be altered as needed to more accurately 
+    reflect hazard impacts in your jurisdiction. The impacts should reflect the worst-case reasonable scenario.</p>
     """, unsafe_allow_html=True)
 
     st.markdown("<p>Briefly describe the worst-case reasonable scenario of this hazard (the scenario to which the following impacts apply) here:</p>", unsafe_allow_html=True)
-    st.text_area("", "The proxy scenario used to predict the impacts of a hazardous materials release in South Dakota is the following: In June 2011, 40 pounds of chlorine gas was accidently released inside a poultry processing plant in Arkansas. This was due to mixing of sodium hypochlorite and FreshFX (an approved antimicrobial treatment).  Initially the release of the gas was not recognized, but fire department personnel were called to the scene for a pregnant women in distress. They noticed several people experience respiratory symptoms and realized that there was a toxic gas release. Fire/EMS triaged affected individuals at the scene and identified 170 workers needing treatment.  A total of 91 patients were seen in the ED, 64 patients were held overnight and released the next day, 6 patients were held for 2 days, 9 patients were released 3 days after the incident.")
+    st.text_area("", "The proxy scenario used to predict the impact of an accidental explosion in South Dakota is the following: The 2013  Fertilizer Plant Explosion and Fire in West, Texas. A fire had erupted at a fertilizer plant (Chemical Saftey Board, 2016). The explosion was caused by large quantities of ammonium nitrate at the plant facility. This chemical is used to make fertilizer, but it known to be highly unstable and dangerous when heated. The blast killed 15 people and injured 260.")
     
     st.markdown("<h3>Probability</h3>", unsafe_allow_html=True)
 
@@ -188,7 +195,7 @@ def show():
     handle_ed_visits_section("Primary Care Office Visits", "Baseline Office Visits per Day", "Hazard-Related Increase in Office Visits per Day", "Please provide data")
     handle_ed_visits_section("Trauma Center Injuries", "Baseline Trauma Injuries per Day", "Hazard-Related Increase in Trauma Injuries per Day",   "Please provide data")
 # Calculate and display Human Impact Score
-    calculate_human_impact_score(HazMat_data)
+    calculate_human_impact_score(AccExp_data)
 
     # Healthcare Service Impact Sections
     st.markdown("<h3 style='text-align: center;'>Healthcare Service Impact</h3>", unsafe_allow_html=True)
@@ -198,7 +205,7 @@ def show():
     handle_healthcare_section("Ancillary Services", "Baseline Pharmacists", "Hazard-Related Loss of Pharmacists", "Hazard-Related Increase in Demand for Pharmacists")
     handle_healthcare_section("Trauma Units", "Baseline Trauma Center ORs", "Hazard-Related Loss of Trauma ORs", "Hazard-Related Increase in Demand for Trauma ORs")
     handle_healthcare_section("Mental Health Services", "Baseline Mental Health Providers", "Hazard-Related Loss of Mental Health Providers", "Hazard-Related Increase in Demand for Providers")
-    calculate_healthcare_service_impact_score(HazMat_data)
+    calculate_healthcare_service_impact_score(AccExp_data)
 
 
 def calculate_magnitude_score(baseline, increase):
@@ -233,10 +240,10 @@ def handle_section(section_title, baseline_label, increase_label, default_explan
 
     
     # Hazard-Related Increase (editable by user, converted to float)
-    HazMat_increase = st.number_input(increase_label, value=0, key=f"{section_title}_HazMat_increase")
+    AccExp_increase = st.number_input(increase_label, value=0, key=f"{section_title}_AccExp_increase")
     
     # Calculate Magnitude Score
-    magnitude_score = calculate_magnitude_score(baseline_value, HazMat_increase)
+    magnitude_score = calculate_magnitude_score(baseline_value, AccExp_increase)
     st.markdown(f"**Magnitude Score:** {magnitude_score}")
     st.markdown("""
         <ul>
@@ -250,7 +257,7 @@ def handle_section(section_title, baseline_label, increase_label, default_explan
     # Save the baseline, increase, and magnitude score
     save_data(section_title, {
         "baseline": baseline_value,
-        "HazMat_increase": HazMat_increase,
+        "AccExp_increase": AccExp_increase,
         "magnitude_score": magnitude_score
     })
     
@@ -305,10 +312,10 @@ def handle_ems_section(section_title, baseline_label, increase_label, default_ex
     st.markdown(f"**{baseline_label}:** {baseline_value}")
 
     # Hazard-Related Increase (editable by user)
-    HazMat_increase = st.number_input(increase_label, value=0, key=f"{section_title}_HazMat_increase")
+    AccExp_increase = st.number_input(increase_label, value=0, key=f"{section_title}_AccExp_increase")
 
     # Calculate Magnitude Score based on EMS Transports logic
-    magnitude_score = calculate_magnitude_score(baseline_value, HazMat_increase)
+    magnitude_score = calculate_magnitude_score(baseline_value, AccExp_increase)
     st.markdown(f"**Magnitude Score:** {magnitude_score}")
     st.markdown("""
         <ul>
@@ -322,7 +329,7 @@ def handle_ems_section(section_title, baseline_label, increase_label, default_ex
     # Save the baseline, increase, and magnitude score
     save_data(section_title, {
         "baseline": baseline_value,
-        "HazMat_increase": HazMat_increase,
+        "AccExp_increase": AccExp_increase,
         "magnitude_score": magnitude_score
     })
 
@@ -375,10 +382,10 @@ def handle_ed_visits_section(section_title, baseline_label, increase_label, defa
     st.markdown(f"**{baseline_label}:** {baseline_value}")
 
     # Hazard-Related Increase (editable by user)
-    HazMat_increase = st.number_input(increase_label, value=0, key=f"{section_title}_HazMat_increase")
+    AccExp_increase = st.number_input(increase_label, value=0, key=f"{section_title}_AccExp_increase")
 
     # Calculate Magnitude Score based on ED Visits logic
-    magnitude_score = calculate_magnitude_score(baseline_value, HazMat_increase)
+    magnitude_score = calculate_magnitude_score(baseline_value, AccExp_increase)
     st.markdown(f"**Magnitude Score:** {magnitude_score}")
     st.markdown("""
         <ul>
@@ -393,7 +400,7 @@ def handle_ed_visits_section(section_title, baseline_label, increase_label, defa
     # # Save the baseline, increase, and magnitude score
     save_data(section_title, {
         "baseline": baseline_value,
-        "HazMat_increase": HazMat_increase,
+        "AccExp_increase": AccExp_increase,
         "magnitude_score": magnitude_score
     })
 
@@ -450,17 +457,17 @@ def calculate_impact_score(scores):
     else:
         return "Not Calculated"
 
-def calculate_human_impact_score(HazMat_data):
+def calculate_human_impact_score(AccExp_data):
     """
     Function to calculate Human Impact Score.
     """
     # Retrieve the final scores for each human impact section
-    mortality_score = HazMat_data.get("Mortality_final", {}).get("final_score", "Not Calculated")
-    ems_transports_score = HazMat_data.get("EMS Transports_final", {}).get("final_score", "Not Calculated")
-    ed_visits_score = HazMat_data.get("ED Visits_final", {}).get("final_score", "Not Calculated")
-    primary_care_office_visits_score = HazMat_data.get("Primary Care Office Visits_final", {}).get("final_score", "Not Calculated")
-    trauma_center_injuries_score = HazMat_data.get("Trauma Center Injuries_final", {}).get("final_score", "Not Calculated")
-    mental_health_score = HazMat_data.get("Mental Health_final", {}).get("final_score", "Not Calculated")
+    mortality_score = AccExp_data.get("Mortality_final", {}).get("final_score", "Not Calculated")
+    ems_transports_score = AccExp_data.get("EMS Transports_final", {}).get("final_score", "Not Calculated")
+    ed_visits_score = AccExp_data.get("ED Visits_final", {}).get("final_score", "Not Calculated")
+    primary_care_office_visits_score = AccExp_data.get("Primary Care Office Visits_final", {}).get("final_score", "Not Calculated")
+    trauma_center_injuries_score = AccExp_data.get("Trauma Center Injuries_final", {}).get("final_score", "Not Calculated")
+    mental_health_score = AccExp_data.get("Mental Health_final", {}).get("final_score", "Not Calculated")
 
     # List of all human impact scores
     human_impact_scores = [
@@ -470,9 +477,9 @@ def calculate_human_impact_score(HazMat_data):
 
     # Calculate the Human Impact Score
     human_impact_score = calculate_impact_score(human_impact_scores)
-   # Save the Human Impact Score to HazMat_data.json
-    HazMat_data["Human_Impact_Score"] = human_impact_score
-    # Save back to the HazMat_data.json file
+   # Save the Human Impact Score to AccExp_data.json
+    AccExp_data["Human_Impact_Score"] = human_impact_score
+    # Save back to the AccExp_data.json file
     save_data("Human Impact Score", {"final_score": human_impact_score})
     st.markdown(f"**Human Impact Score:** {human_impact_score}")
     return human_impact_score
@@ -518,49 +525,49 @@ def handle_healthcare_section(section_title, baseline_label, loss_label, increas
     st.markdown(f"**{baseline_label}:** {baseline_value}")
 
     # Hazard-Related Loss (editable by user)
-    HazMat_loss_value = st.number_input(loss_label, value=0, key=f"{section_title}_HazMat_loss")
+    AccExp_loss_value = st.number_input(loss_label, value=0, key=f"{section_title}_AccExp_loss")
 
     # Logic for ED Services: Hazard-Related Increase = ED Visits / 4.5
     if section_title == "ED Services":
-        HazMat_data = load_HazMat_data()  # Load data from ED Visits section
-        HazMat_increase_visits = HazMat_data.get("ED Visits", {}).get("HazMat_increase", 0)
-        HazMat_increase_value = HazMat_increase_visits / 4.5
-        st.markdown(f"**{increase_label}:** {HazMat_increase_value}")
+        AccExp_data = load_AccExp_data()  # Load data from ED Visits section
+        AccExp_increase_visits = AccExp_data.get("ED Visits", {}).get("AccExp_increase", 0)
+        AccExp_increase_value = AccExp_increase_visits / 4.5
+        st.markdown(f"**{increase_label}:** {AccExp_increase_value}")
 
     # Logic for Outpatient Services: Hazard-Related Increase = Office Visits / 20
     elif section_title == "Outpatient Services":
-        HazMat_data = load_HazMat_data()  # Load data from Primary Care Office Visits section
-        HazMat_increase_visits = HazMat_data.get("Primary Care Office Visits", {}).get("HazMat_increase", 0)
-        HazMat_increase_value = HazMat_increase_visits / 20
-        st.markdown(f"**{increase_label}:** {HazMat_increase_value}")
+        AccExp_data = load_AccExp_data()  # Load data from Primary Care Office Visits section
+        AccExp_increase_visits = AccExp_data.get("Primary Care Office Visits", {}).get("AccExp_increase", 0)
+        AccExp_increase_value = AccExp_increase_visits / 20
+        st.markdown(f"**{increase_label}:** {AccExp_increase_value}")
 
     # Logic for Hospital Beds: Editable by user
     elif section_title == "Hospital Beds":
         # Hazard-Related Increase (editable by user)
-        HazMat_increase_value = st.number_input(increase_label, value=0, key=f"{section_title}_HazMat_increase")
+        AccExp_increase_value = st.number_input(increase_label, value=0, key=f"{section_title}_AccExp_increase")
 
     # Logic for Anxillary Services: Editable by user
     elif section_title == "Ancillary Services":
         # Hazard-Related Increase (editable by user)
-        HazMat_increase_value = st.number_input(increase_label, value=0, key=f"{section_title}_HazMat_increase")
+        AccExp_increase_value = st.number_input(increase_label, value=0, key=f"{section_title}_AccExp_increase")
 
     
     elif section_title == "Trauma Units":
-        HazMat_data = load_HazMat_data()  # Load data from Primary Care Office Visits section
-        HazMat_increase_visits = HazMat_data.get("Trauma Center Injuries", {}).get("HazMat_increase", 0)
-        HazMat_increase_value = HazMat_increase_visits 
-        st.markdown(f"**{increase_label}:** {HazMat_increase_value}")
+        AccExp_data = load_AccExp_data()  # Load data from Primary Care Office Visits section
+        AccExp_increase_visits = AccExp_data.get("Trauma Center Injuries", {}).get("AccExp_increase", 0)
+        AccExp_increase_value = AccExp_increase_visits 
+        st.markdown(f"**{increase_label}:** {AccExp_increase_value}")
     
     # Logic for Mental Health Services: Editable by user
     elif section_title == "Mental Health Services":
         # Hazard-Related Increase (editable by user)
-        HazMat_increase_value = st.number_input(increase_label, value=0, key=f"{section_title}_HazMat_increase")
+        AccExp_increase_value = st.number_input(increase_label, value=0, key=f"{section_title}_AccExp_increase")
 
     else:
-        hazard_increase_value = 0
+        AccExp_increase_value = 0
 
     # Calculate Magnitude Score
-    magnitude_score = calculate_magnitude_score_healthcare(baseline_value, HazMat_increase_value, HazMat_loss_value)
+    magnitude_score = calculate_magnitude_score_healthcare(baseline_value, AccExp_increase_value, AccExp_loss_value)
     st.markdown(f"**Magnitude Score:** {magnitude_score}")
     st.markdown("""
         <ul>
@@ -575,8 +582,8 @@ def handle_healthcare_section(section_title, baseline_label, loss_label, increas
     # Save the baseline, increase, and magnitude score
     save_data(section_title, {
         "baseline": baseline_value,
-        "HazMat_increase": HazMat_increase_value,
-        "HazMat_loss_value": HazMat_loss_value,
+        "AccExp_increase": AccExp_increase_value,
+        "AccExp_loss_value": AccExp_loss_value,
         "magnitude_score": magnitude_score
     })
 
@@ -633,16 +640,16 @@ def calculate_impact_score(scores):
     else:
         return "Not Calculated"
 
-def calculate_healthcare_service_impact_score(HazMat_data):
+def calculate_healthcare_service_impact_score(AccExp_data):
     """
     Function to calculate Healthcare Service Impact Score.
     """
-    outpatient_score = HazMat_data.get("Outpatient Services_final", {}).get("final_score", "Not Calculated")
-    ed_services_score = HazMat_data.get("ED Services_final", {}).get("final_score", "Not Calculated")
-    hospital_beds_score = HazMat_data.get("Hospital Beds_final", {}).get("final_score", "Not Calculated")
-    ancillary_services_score = HazMat_data.get("Ancillary Services_final", {}).get("final_score", "Not Calculated")
-    trauma_units_score = HazMat_data.get("Trauma Units_final", {}).get("final_score", "Not Calculated")
-    mental_health_score = HazMat_data.get("Mental Health Services_final", {}).get("final_score", "Not Calculated")
+    outpatient_score = AccExp_data.get("Outpatient Services_final", {}).get("final_score", "Not Calculated")
+    ed_services_score = AccExp_data.get("ED Services_final", {}).get("final_score", "Not Calculated")
+    hospital_beds_score = AccExp_data.get("Hospital Beds_final", {}).get("final_score", "Not Calculated")
+    ancillary_services_score = AccExp_data.get("Ancillary Services_final", {}).get("final_score", "Not Calculated")
+    trauma_units_score = AccExp_data.get("Trauma Units_final", {}).get("final_score", "Not Calculated")
+    mental_health_score = AccExp_data.get("Mental Health Services_final", {}).get("final_score", "Not Calculated")
 
     # List of all healthcare scores
     healthcare_scores = [
@@ -652,8 +659,8 @@ def calculate_healthcare_service_impact_score(HazMat_data):
 
     # Calculate the Healthcare Service Impact Score
     healthcare_service_impact_score = calculate_impact_score(healthcare_scores)
-    #save HazMat_data
-    HazMat_data["Healthcare_Service_Impact_Score"] = healthcare_service_impact_score
+    #save AccExp_data
+    AccExp_data["Healthcare_Service_Impact_Score"] = healthcare_service_impact_score
     st.markdown(f"**Healthcare Service Impact Score:** {healthcare_service_impact_score}")
     return healthcare_service_impact_score
 
